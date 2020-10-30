@@ -124,11 +124,14 @@ def preprocess(payload: PredictRequest):
 
 
 def create_grpc_request(x, target):
+    tensor_x = make_tensor_proto(
+        values=x,
+        dtype=types_pb2.DT_FLOAT,
+        shape=x.shape,
+    )
     return predict_pb2.PredictRequest(
         model_spec={'name': target},
-        inputs={'input_1': make_tensor_proto(
-            x, dtype=types_pb2.DT_FLOAT, shape=(1, 8, 16)
-        )}
+        inputs={'input_1': tensor_x},
     )
 
 
