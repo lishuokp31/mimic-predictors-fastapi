@@ -47,7 +47,7 @@ app = FastAPI()
 TODO: add comment
 """
 host, port = os.environ['GRPC_HOST'], os.environ['GRPC_PORT']
-channel = grpc.insecure_channel(f"{host}:{port}")
+channel = grpc.aio.insecure_channel(f"{host}:{port}")
 stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
 
 """
@@ -172,5 +172,5 @@ def normalize(params, x):
 async def predict(payload: PredictRequest):
     x, target = preprocess(payload)
     request = create_grpc_request(x, target)
-    response = stub.Predict(request)
+    response = await stub.Predict(request)
     return postprocess(response)
