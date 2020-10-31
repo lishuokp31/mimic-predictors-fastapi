@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from core.db.utils import init_mongodb
 from core.impl import (
@@ -9,8 +10,15 @@ from core.models import PredictRequest
 from core.utils import init_prediction_service_stub, init_norm_params
 
 
-app = FastAPI()
 vars = {}
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 
 
 @app.on_event('startup')

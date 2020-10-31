@@ -1,5 +1,15 @@
 version: "3.8"
 services:
+  app-client:
+    build:
+      context: ./services/app-client
+      dockerfile: Dockerfile.nginx
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - api-server
+
   api-server:
     build:
       context: ./services/api-server
