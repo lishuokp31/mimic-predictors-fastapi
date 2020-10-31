@@ -16,6 +16,10 @@
 
 # How to Build/Run
 
-```bash
-docker-compose up --build
-```
+1. Execute the following command to build/run the containers.
+
+   ```bash
+   docker-compose up --build
+   ```
+   
+2. Go to [http://localhost](http://localhost)
