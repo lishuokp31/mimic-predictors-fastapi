@@ -1,17 +1,21 @@
+from typing import Dict
 from fastapi import HTTPException, status
 
 from tensorflow import make_tensor_proto, TensorShape
 from tensorflow.core.framework import types_pb2
 from tensorflow_serving.apis import predict_pb2
+from tensorflow_serving.apis.prediction_service_pb2_grpc import PredictionServiceStub
 
 from ..models import PredictRequest
 from ..constants import TARGETS, N_FEATURES, N_TIMESTEPS
-from ..utils import norm_params, prediction_service_stub
 
 import numpy as np
 
 
-def preprocess(payload: PredictRequest):
+def preprocess(
+    payload: PredictRequest,
+    norm_params: Dict[str, Dict[str, np.ndarray]],
+):
     # target refers to the model the caller wants to use
     target = payload.target
 
@@ -72,7 +76,7 @@ def preprocess(payload: PredictRequest):
 
     # manual input normalization is needed for legacy models (except AKI)
     if target != 'aki':
-        x = normalize(norm_params()[target], x)
+        x = normalize(norm_params[target], x)
 
     return x, target
 
@@ -125,16 +129,19 @@ def normalize(params, x):
     return x
 
 
-async def predict(payload: PredictRequest):
+async def predict(
+    payload: PredictRequest,
+    stub: PredictionServiceStub,
+    norm_params: Dict[str, Dict[str, np.ndarray]],
+):
     # validate and clean request payload
-    x, target = preprocess(payload)
+    x, target = preprocess(payload, norm_params)
 
     # create gRPC request in preparation
     # for inference using TensorFlow serving
     request = create_grpc_request(x, target)
 
     # pass data to TensorFlow serving for inference
-    stub = prediction_service_stub()
     response = await stub.Predict(request)
 
     # format and return prediction results
