@@ -4,8 +4,6 @@ services:
     image: mimicpredictors/frontend
     build:
       context: ./services/frontend
-    ports:
-      - 80:80
     depends_on:
       - backend
 
@@ -21,8 +19,6 @@ services:
       DB_DATABASE: mimic-predictors-samples
       DB_USER: root
       DB_PASSWORD: root
-    ports:
-      - 5050:80
     depends_on:
       - tf-serving
       - mongodb

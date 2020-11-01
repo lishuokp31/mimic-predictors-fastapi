@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  frontend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.app-strip-prefix.stripprefix.prefixes=/app"
+      - "traefik.http.routers.frontend.middlewares=app-strip-prefix@docker"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/app/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+
+  backend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend.entrypoints=web"
