@@ -1,19 +1,18 @@
 version: "3.8"
 services:
-  app-client:
+  frontend:
+    image: mimicpredictors/frontend
     build:
-      context: ./services/app-client
-      dockerfile: Dockerfile.nginx
-    restart: always
+      context: ./services/frontend
     ports:
       - 80:80
     depends_on:
-      - api-server
+      - backend
 
-  api-server:
+  backend:
+    image: mimicpredictors/backend
     build:
-      context: ./services/api-server
-      dockerfile: Dockerfile.fastapi
+      context: ./services/backend
     restart: always
     environment:
       GRPC_HOST: tf-serving
@@ -30,9 +29,9 @@ services:
       - mongodb
 
   mongodb:
+    image: mimicpredictors/mongodb
     build:
       context: ./services/mongodb
-      dockerfile: Dockerfile.db
     restart: always
     environment:
       MONGO_INITDB_DATABASE: mimic-predictors-samples
@@ -42,9 +41,9 @@ services:
       - 27017
 
   tf-serving:
+    image: mimicpredictors/tf-serving
     build:
       context: ./services/tf-serving
-      dockerfile: Dockerfile.tf
     restart: always
     command:
       - "--model_config_file=/models/model.config"
