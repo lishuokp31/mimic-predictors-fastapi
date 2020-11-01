@@ -13,7 +13,6 @@ services:
     image: mimicpredictors/backend
     build:
       context: ./services/backend
-    restart: always
     environment:
       GRPC_HOST: tf-serving
       GRPC_PORT: 5000
@@ -32,11 +31,12 @@ services:
     image: mimicpredictors/mongodb
     build:
       context: ./services/mongodb
-    restart: always
     environment:
       MONGO_INITDB_DATABASE: mimic-predictors-samples
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root # TODO: put in secrets file
+    volumes:
+      - mongodb_data:/data/db
     expose:
       - 27017
 
@@ -44,10 +44,12 @@ services:
     image: mimicpredictors/tf-serving
     build:
       context: ./services/tf-serving
-    restart: always
     command:
       - "--model_config_file=/models/model.config"
       - "--port=5000"
       - "--rest_api_port=0"
     expose:
       - 5000
+
+volumes:
+  mongodb_data:
