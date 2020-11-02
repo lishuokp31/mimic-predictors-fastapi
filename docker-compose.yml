@@ -11,6 +11,8 @@ services:
     image: mimicpredictors/backend
     build:
       context: ./services/backend
+      args:
+        PIP_MIRROR: https://mirrors.aliyun.com/pypi/simple/
     environment:
       GRPC_HOST: tf-serving
       GRPC_PORT: 5000
