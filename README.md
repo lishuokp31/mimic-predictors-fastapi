@@ -10,7 +10,7 @@
 
    - saved_models → `services/tf-serving/saved_models`
    - js_scripts → `services/mongodb/js_scripts`
-   - mimic-predictors-ui → `services/app-client/mimic-predictors-ui`
+   - mimic-predictors-ui → `services/frontend/mimic-predictors-ui`
 
 3. Proceed to build/running the containers.
 
