@@ -3,18 +3,29 @@ version: "3.8"
 services:
   frontend:
     deploy:
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.middlewares.app-strip-prefix.stripprefix.prefixes=/app"
-        - "traefik.http.routers.frontend.middlewares=app-strip-prefix@docker"
-        - "traefik.http.routers.frontend.rule=PathPrefix(`/app`, `/app/`)"
-        - "traefik.http.routers.frontend.entrypoints=web"
-        - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      replicas: 3
+      placement:
+        max_replicas_per_node: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
   backend:
     deploy:
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
-        - "traefik.http.routers.backend.entrypoints=web"
-        - "traefik.http.services.backend.loadbalancer.server.port=80"
+      replicas: 6
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  tf-serving:
+    deploy:
+      replicas: 6
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
