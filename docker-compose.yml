@@ -1,32 +1,27 @@
 version: "3.8"
 services:
   frontend:
-    image: mimicpredictors/frontend
+    image: hitmimicpredictors/frontend
     build:
       context: ./services/frontend
-    depends_on:
-      - backend
 
   backend:
-    image: mimicpredictors/backend
+    image: hitmimicpredictors/backend
     build:
       context: ./services/backend
       args:
         PIP_MIRROR: https://mirrors.aliyun.com/pypi/simple/
     environment:
       GRPC_HOST: tf-serving
-      GRPC_PORT: 5000
+      GRPC_PORT: 9090
       DB_HOST: mongodb
       DB_PORT: 27017
       DB_DATABASE: mimic-predictors-samples
       DB_USER: root
       DB_PASSWORD: root
-    depends_on:
-      - tf-serving
-      - mongodb
 
   mongodb:
-    image: mimicpredictors/mongodb
+    image: hitmimicpredictors/mongodb
     build:
       context: ./services/mongodb
     environment:
@@ -37,12 +32,12 @@ services:
       - mongodb_data:/data/db
 
   tf-serving:
-    image: mimicpredictors/tf-serving
+    image: hitmimicpredictors/tf-serving
     build:
       context: ./services/tf-serving
     command:
       - "--model_config_file=/models/model.config"
-      - "--port=5000"
+      - "--port=9090"
       - "--rest_api_port=0"
 
 volumes:

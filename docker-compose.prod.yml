@@ -1,31 +1,53 @@
 version: "3.8"
 
 services:
+  traefik:
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
   frontend:
     deploy:
-      replicas: 3
+      replicas: 18
       placement:
-        max_replicas_per_node: 1
+        constraints:
+          - node.role != manager
       update_config:
         parallelism: 2
         delay: 10s
+        order: start-first
       restart_policy:
         condition: on-failure
+        delay: 5s
+        max_attempts: 5
 
   backend:
     deploy:
-      replicas: 6
+      replicas: 18
+      placement:
+        constraints:
+          - node.role != manager
       update_config:
         parallelism: 2
         delay: 10s
+        order: start-first
       restart_policy:
         condition: on-failure
+        delay: 5s
+        max_attempts: 5
 
   tf-serving:
     deploy:
-      replicas: 6
+      replicas: 18
+      placement:
+        constraints:
+          - node.role != manager
       update_config:
         parallelism: 2
         delay: 10s
+        order: start-first
       restart_policy:
         condition: on-failure
+        delay: 5s
+        max_attempts: 5
