@@ -129,7 +129,7 @@ def normalize(params, x):
     return x
 
 
-async def predict(
+def predict(
     payload: PredictRequest,
     stub: PredictionServiceStub,
     norm_params: Dict[str, Dict[str, np.ndarray]],
@@ -142,7 +142,7 @@ async def predict(
     request = create_grpc_request(x, target)
 
     # pass data to TensorFlow serving for inference
-    response = await stub.Predict(request)
+    response = stub.Predict(request)
 
     # format and return prediction results
     return postprocess(response)

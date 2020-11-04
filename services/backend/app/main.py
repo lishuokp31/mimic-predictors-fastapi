@@ -30,18 +30,22 @@ def startup_event():
 
 @app.on_event('shutdown')
 def shutdown_event():
-    # terminate all connections in the pool
     if vars['client'] is not None:
         vars['client'].close()
 
 
 @app.post('/api/predict')
 async def predict(payload: PredictRequest):
-    stub, norm_params = vars['stub'], vars['norm_params']
-    return await predict_impl(payload, stub, norm_params)
+    return predict_impl(
+        payload=payload,
+        stub=vars['stub'],
+        norm_params=vars['norm_params'],
+    )
 
 
 @app.get('/api/load-sample')
 async def load_sample(target: str):
-    db = vars['db']
-    return await load_sample_impl(target, db)
+    return await load_sample_impl(
+        target=target,
+        db=vars['db'],
+    )
