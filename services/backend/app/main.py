@@ -7,18 +7,26 @@ from core.impl import (
     load_sample as load_sample_impl,
 )
 from core.models import PredictRequest
-from core.utils import init_prediction_service_stub, init_norm_params
+from core.utils import (
+    init_prediction_service_stub,
+    init_norm_params
+)
 
+import os
 
 vars = {}
 app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['http://localhost'],
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
+
+# configure CORS middleware if origins env var is set
+cors_origins = os.getenv('CORS_ORIGINS')
+if cors_origins is not None:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins.split(','),
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
 
 
 @app.on_event('startup')
