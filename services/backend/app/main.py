@@ -5,6 +5,8 @@ from core.db.utils import init_mongodb
 from core.impl import (
     predict as predict_impl,
     load_sample as load_sample_impl,
+    get_patients as get_patients_impl,
+    get_patient as get_patient_impl,
 )
 from core.models import PredictRequest
 from core.utils import (
@@ -56,4 +58,16 @@ async def load_sample(target: str):
     return await load_sample_impl(
         target=target,
         db=vars['db'],
+    )
+
+
+@app.get('/api/patients')
+async def get_patients():
+    return await get_patients_impl(db=vars['db'])
+
+@app.get('/api/patients/{patient_id}')
+async def get_patient(patient_id: str):
+    return await get_patient_impl(
+        db=vars['db'], 
+        patient_id=patient_id,
     )
