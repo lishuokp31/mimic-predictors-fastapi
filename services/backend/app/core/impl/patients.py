@@ -11,6 +11,7 @@ from ..models import Patient
 from .utils import parse_chart_events
 
 import motor.motor_asyncio
+import random
 
 
 async def get_patients(db: motor.motor_asyncio.AsyncIOMotorDatabase):
@@ -42,6 +43,49 @@ async def get_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient_id: 
     # we replace the `_id` property with a simple `id` property of type string
     patient['id'] = str(patient['_id'])
     del patient['_id']
+
+    # add key patient metrics and disease probabilities
+    # TODO: change to reflect data in database
+    patient['metrics'] = [
+        {
+            'label': '体温',
+            'unit': '℃',
+            'mean': random.normalvariate(36.2, 0.63),
+            'min': random.normalvariate(36.2, 0.63),
+            'max': random.normalvariate(36.2, 0.63),
+            'std': 0.63,
+        },
+        {
+            'label': '心率',
+            'unit': 'bpm',
+            'mean': random.normalvariate(63, 4.19),
+            'min': random.normalvariate(63, 4.19),
+            'max': random.normalvariate(63, 4.19),
+            'std': 4.19,
+        },
+        {
+            'label': '收缩压',
+            'unit': 'mmHg',
+            'mean': random.normalvariate(120, 7.36),
+            'min': random.normalvariate(120, 7.36),
+            'max': random.normalvariate(120, 7.36),
+            'std': 7.36,
+        },
+        {
+            'label': '舒张压',
+            'unit': 'mmHg',
+            'mean': random.normalvariate(80, 6.85),
+            'min': random.normalvariate(80, 6.85),
+            'max': random.normalvariate(80, 6.85),
+            'std': 6.85,
+        }
+    ]
+    patient['probabilities'] = {
+        'aki': [random.uniform(0, 1) for _ in range(8)],
+        'sepsis': [random.uniform(0, 1) for _ in range(14)],
+        'mi': [random.uniform(0, 1) for _ in range(14)],
+        'vancomycin': [random.uniform(0, 1) for _ in range(14)],
+    }
 
     return patient
 
