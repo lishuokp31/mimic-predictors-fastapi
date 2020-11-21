@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.db.utils import init_mongodb
@@ -7,6 +7,7 @@ from core.impl import (
     load_sample as load_sample_impl,
     get_patients as get_patients_impl,
     get_patient as get_patient_impl,
+    import_patient as import_patient_impl,
 )
 from core.models import PredictRequest
 from core.utils import (
@@ -65,9 +66,32 @@ async def load_sample(target: str):
 async def get_patients():
     return await get_patients_impl(db=vars['db'])
 
+
+@app.post('/api/patients')
+async def import_patient(
+    id: str = Form(...),
+    name: str = Form(...),
+    age: int = Form(...),
+    gender: str = Form(...),
+    ethnicity: str = Form(...),
+    importfile: UploadFile = File(...)
+):
+    return await import_patient_impl(
+        db=vars['db'],
+        id=id,
+        name=name,
+        age=age,
+        gender=gender,
+        ethnicity=ethnicity,
+        weight=0,
+        height=0,
+        import_file=importfile,
+    )
+
+
 @app.get('/api/patients/{patient_id}')
 async def get_patient(patient_id: str):
     return await get_patient_impl(
-        db=vars['db'], 
+        db=vars['db'],
         patient_id=patient_id,
     )
