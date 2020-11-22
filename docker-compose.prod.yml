@@ -16,8 +16,6 @@ services:
           - node.role != manager
       update_config:
         parallelism: 3
-        delay: 10s
-        order: start-first
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -32,8 +30,6 @@ services:
           - node.role != manager
       update_config:
         parallelism: 3
-        delay: 10s
-        order: start-first
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -48,8 +44,6 @@ services:
           - node.role != manager
       update_config:
         parallelism: 3
-        delay: 10s
-        order: start-first
       restart_policy:
         condition: on-failure
         delay: 5s

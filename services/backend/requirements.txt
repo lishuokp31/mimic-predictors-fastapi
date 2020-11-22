@@ -1,5 +1,5 @@
 motor~=2.3.0
 pandas~=1.1.4
 python-multipart~=0.0.5
-tensorflow~=2.3.0
-tensorflow-serving-api~=2.3.0
+tensorflow~=2.4.0rc2
+tensorflow-serving-api~=2.3.0   
