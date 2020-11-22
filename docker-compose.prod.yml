@@ -9,12 +9,13 @@ services:
 
   frontend:
     deploy:
-      replicas: 18
+      replicas: 9
       placement:
+        max_replicas_per_node: 1
         constraints:
           - node.role != manager
       update_config:
-        parallelism: 2
+        parallelism: 3
         delay: 10s
         order: start-first
       restart_policy:
@@ -24,12 +25,13 @@ services:
 
   backend:
     deploy:
-      replicas: 18
+      replicas: 9
       placement:
+        max_replicas_per_node: 1
         constraints:
           - node.role != manager
       update_config:
-        parallelism: 2
+        parallelism: 3
         delay: 10s
         order: start-first
       restart_policy:
@@ -39,12 +41,13 @@ services:
 
   tf-serving:
     deploy:
-      replicas: 18
+      replicas: 9
       placement:
+        max_replicas_per_node: 1
         constraints:
           - node.role != manager
       update_config:
-        parallelism: 2
+        parallelism: 3
         delay: 10s
         order: start-first
       restart_policy:

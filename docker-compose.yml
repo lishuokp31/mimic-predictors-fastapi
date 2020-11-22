@@ -12,22 +12,12 @@ services:
     environment:
       GRPC_HOST: tf-serving
       GRPC_PORT: 9090
-      DB_HOST: mongodb
+      DB_HOSTS: /run/secrets/db_hosts
       DB_PORT: 27017
-      DB_DATABASE: mimic-predictors-samples
-      DB_USER: root
-      DB_PASSWORD: root
-
-  mongodb:
-    image: hitmimicpredictors/mongodb
-    build:
-      context: ./services/mongodb
-    environment:
-      MONGO_INITDB_DATABASE: mimic-predictors-samples
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root # TODO: put in secrets file
-    volumes:
-      - mongodb_data:/data/db
+      DB_DATABASE: mimic-predictors
+      DB_USER: /run/secrets/db_user
+      DB_PASSWORD: /run/secrets/db_password
+      DB_REPLICA_SET: mimic-predictors-mongodb-rs
 
   tf-serving:
     image: hitmimicpredictors/tf-serving
@@ -38,5 +28,10 @@ services:
       - "--port=9090"
       - "--rest_api_port=0"
 
-volumes:
-  mongodb_data:
+secrets:
+  db_hosts:
+    external: true
+  db_user:
+    external: true
+  db_password:
+    external: true
