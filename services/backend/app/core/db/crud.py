@@ -24,12 +24,7 @@ async def get_one_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient_
 
 async def insert_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient: Patient):
     # convert patient dataclass into a dictionary
-    # also convert its chartevents list
     patient = patient._asdict()
-    patient['chartevents'] = [
-        event._asdict()
-        for event in patient['chartevents']
-    ]
 
     # convert patient id into an object id
     patient['_id'] = patient['id']

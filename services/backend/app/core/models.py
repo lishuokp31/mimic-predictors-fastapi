@@ -9,7 +9,6 @@ class PredictRequest(BaseModel):
     x: List[List[int]]
 
 
-ChartEvent = namedtuple('ChartEvent', ['charttime',  'itemid', 'value'])
 Patient = namedtuple('Patient', [
     'id', 'name', 'age', 'gender', 'weight',
     'height', 'ethnicity', 'added_at', 'updated_at', 'chartevents']
