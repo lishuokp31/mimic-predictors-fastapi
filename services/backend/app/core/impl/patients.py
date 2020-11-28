@@ -61,6 +61,11 @@ async def get_patient(
     events = reduce_chartevents(patient['chartevents'])
     del patient['chartevents']
 
+    # add more static information that can be inferred from the dataset
+    # e.g. admission date, length of stay
+    patient['admitDate'] = events.index[0]
+    patient['los'] = events.shape[0]
+
     # add key patient metrics and disease probabilities
     patient['metrics'] = extract_metrics(events)
     patient['probabilities'] = extract_disease_probabilities(
