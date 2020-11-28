@@ -18,8 +18,7 @@ async def get_all_patients(db: motor.motor_asyncio.AsyncIOMotorDatabase, docs_pe
 
 async def get_one_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient_id: str):
     query = {'_id': patient_id}
-    projection = {'chartevents': 0}
-    return await db.patients.find_one(query, projection)
+    return await db.patients.find_one(query)
 
 
 async def insert_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient: Patient):

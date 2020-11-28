@@ -1,5 +1,7 @@
 from datetime import datetime
 from fastapi import HTTPException, status, UploadFile
+from tensorflow_serving.apis.prediction_service_pb2_grpc import PredictionServiceStub
+from typing import Dict
 
 from ..constants import GENDERS, ETHNICITIES
 from ..db.crud import (
@@ -8,10 +10,15 @@ from ..db.crud import (
     insert_patient,
 )
 from ..models import Patient
-from .utils import parse_chart_events
+from .utils import (
+    parse_chartevents,
+    reduce_chartevents,
+    extract_metrics,
+    extract_disease_probabilities,
+)
 
 import motor.motor_asyncio
-import random
+import numpy as np
 
 
 async def get_patients(db: motor.motor_asyncio.AsyncIOMotorDatabase):
@@ -31,7 +38,12 @@ async def get_patients(db: motor.motor_asyncio.AsyncIOMotorDatabase):
     return patients
 
 
-async def get_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient_id: str):
+async def get_patient(
+    patient_id: str,
+    db: motor.motor_asyncio.AsyncIOMotorDatabase,
+    stub: PredictionServiceStub,
+    norm_params: Dict[str, Dict[str, np.ndarray]],
+):
     patient = await get_one_patient(db, patient_id)
 
     if patient is None:
@@ -44,48 +56,15 @@ async def get_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient_id: 
     patient['id'] = str(patient['_id'])
     del patient['_id']
 
+    # combine multiple feature values into day blocks
+    # then delete chartevents (we don't want to pass this raw data to the client)
+    events = reduce_chartevents(patient['chartevents'])
+    del patient['chartevents']
+
     # add key patient metrics and disease probabilities
-    # TODO: change to reflect data in database
-    patient['metrics'] = [
-        {
-            'label': '体温',
-            'unit': '℃',
-            'mean': random.normalvariate(36.2, 0.63),
-            'min': random.normalvariate(36.2, 0.63),
-            'max': random.normalvariate(36.2, 0.63),
-            'std': 0.63,
-        },
-        {
-            'label': '心率',
-            'unit': 'bpm',
-            'mean': random.normalvariate(63, 4.19),
-            'min': random.normalvariate(63, 4.19),
-            'max': random.normalvariate(63, 4.19),
-            'std': 4.19,
-        },
-        {
-            'label': '收缩压',
-            'unit': 'mmHg',
-            'mean': random.normalvariate(120, 7.36),
-            'min': random.normalvariate(120, 7.36),
-            'max': random.normalvariate(120, 7.36),
-            'std': 7.36,
-        },
-        {
-            'label': '舒张压',
-            'unit': 'mmHg',
-            'mean': random.normalvariate(80, 6.85),
-            'min': random.normalvariate(80, 6.85),
-            'max': random.normalvariate(80, 6.85),
-            'std': 6.85,
-        }
-    ]
-    patient['probabilities'] = {
-        'aki': [random.uniform(0, 1) for _ in range(8)],
-        'sepsis': [random.uniform(0, 1) for _ in range(14)],
-        'mi': [random.uniform(0, 1) for _ in range(14)],
-        'vancomycin': [random.uniform(0, 1) for _ in range(14)],
-    }
+    patient['metrics'] = extract_metrics(events)
+    patient['probabilities'] = extract_disease_probabilities(
+        patient, events, stub, norm_params)
 
     return patient
 
@@ -138,7 +117,7 @@ async def import_patient(
 
     # attempt to parse the uploaded CSV file
     try:
-        chartevents = parse_chart_events(import_file.file)
+        chartevents = parse_chartevents(import_file.file)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -150,7 +129,7 @@ async def import_patient(
         id=id, name=name, age=age,
         weight=weight, height=height,
         gender=gender, ethnicity=ethnicity,
-        added_at=datetime.today(), updated_at=datetime.today(),
+        addedAt=datetime.today(), updatedAt=datetime.today(),
         chartevents=chartevents,
     ))
 

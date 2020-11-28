@@ -92,6 +92,8 @@ async def import_patient(
 @app.get('/api/patients/{patient_id}')
 async def get_patient(patient_id: str):
     return await get_patient_impl(
-        db=vars['db'],
         patient_id=patient_id,
+        db=vars['db'],
+        stub=vars['stub'],
+        norm_params=vars['norm_params'],
     )

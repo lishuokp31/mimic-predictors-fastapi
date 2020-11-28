@@ -11,5 +11,5 @@ class PredictRequest(BaseModel):
 
 Patient = namedtuple('Patient', [
     'id', 'name', 'age', 'gender', 'weight',
-    'height', 'ethnicity', 'added_at', 'updated_at', 'chartevents']
+    'height', 'ethnicity', 'addedAt', 'updatedAt', 'chartevents']
 )
