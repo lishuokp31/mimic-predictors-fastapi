@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 class PredictRequest(BaseModel):
     target: str
-    x: List[List[int]]
+    x: List[List[float]]
 
 
 Patient = namedtuple('Patient', [

@@ -121,6 +121,7 @@ def extract_disease_probabilities(
 
     # do forward/backward imputation to fill holes
     df = df.ffill().bfill()
+    df = df.fillna(0)
 
     # for patients with long stays (n_days > 14)
     # we only take the recent 14 days into account
@@ -137,7 +138,7 @@ def extract_disease_probabilities(
 def do_predict(
     df: pd.DataFrame,
     stub: PredictionServiceStub,
-    norm_params: Dict[str, Dict[str, np.ndarray]],
+    params: Dict[str, Dict[str, np.ndarray]],
     target: str,
     features: List[str],
 ):
@@ -146,22 +147,22 @@ def do_predict(
     if target == 'aki':
         df = df.iloc[-N_TIMESTEPS['aki']:]
 
+    # determine columns that doesn't have any values
+    missing_features = list(set(features).difference(df.columns))
+
+    # forgiving mode: missing feature values will be replaced with 0
+    # TODO: complete sample data and remove this
+    df.loc[:, missing_features] = 0
+
     try:
         x = df[features].values.tolist()
         payload = PredictRequest(target=target, x=x)
-        response = predict(payload, stub, norm_params)
-        missing_features = []
+        response = predict(payload, stub, params)
         predictions, weights = response['predictions'], response['weights']
-    except KeyError as e:
-        # part of the message exception are the feature names which doesn't
-        # contain any values, so we parse it to get its value
-        e_str = str(e)
-        start, end = e_str.index('[') + 1, e_str.index(']')
-        missing_features = [mf[1:-1] for mf in e_str[start:end].split(', ')]
-
+    except KeyError:
         # we fill missing values with nan so that the user will know which
         # values are missing and should be added (if needed)
-        df[missing_features] = np.nan
+        df.loc[:, missing_features] = np.nan
         x = df[features].values.tolist()
         predictions, weights = None, None
 

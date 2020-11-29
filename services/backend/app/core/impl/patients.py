@@ -69,7 +69,8 @@ async def get_patient(
     # add key patient metrics and disease probabilities
     patient['metrics'] = extract_metrics(events)
     patient['probabilities'] = extract_disease_probabilities(
-        patient, events, stub, norm_params)
+        patient, events, stub, norm_params
+    )
 
     return patient
 
