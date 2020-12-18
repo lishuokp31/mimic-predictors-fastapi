@@ -21,7 +21,8 @@ vars = {}
 app = FastAPI()
 
 # configure CORS middleware if origins env var is set
-cors_origins = os.getenv('CORS_ORIGINS')
+# cors_origins = os.getenv('CORS_ORIGINS')
+cors_origins = 'http://localhost:4200,http://192.168.1.3:4200'
 if cors_origins is not None:
     app.add_middleware(
         CORSMiddleware,

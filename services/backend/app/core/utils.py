@@ -28,7 +28,7 @@ def init_prediction_service_stub() -> PredictionServiceStub:
     )
 
     # initialize channel and stub
-    host, port = os.environ['GRPC_HOST'], os.environ['GRPC_PORT']
+    host, port = 'localhost', 9090
     channel = grpc.intercept_channel(
         grpc.insecure_channel(f"{host}:{port}"),
         *interceptors,
