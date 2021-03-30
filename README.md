@@ -1,88 +1,30 @@
-# Prerequisites
+# Test Locally
 
-1. [Docker](https://www.docker.com)
+Install all requirements listed in `requirements.txt` including `uvicorn` and `fastapi` and run the following command:
 
-# Preparations
+```
+cd app
+uvicorn main:app --reload
+```
 
-1. Download `assets.zip` from latest [releases](https://github.com/miggymigz/mimic-predictors-fastapi/releases). `assets.zip` contains 3 directories: `saved_models`, `js_scripts`, and `mimic-predictors-ui`.
+Make sure that `tf-serving` and mongodb is running.
 
-2. Extract the archive and place the 3 directories as shown below:
+# Build Image for Huawei SWR
 
-   - saved_models → `services/tf-serving/saved_models`
-   - js_scripts → `services/mongodb/js_scripts`
-   - mimic-predictors-ui → `services/frontend/mimic-predictors-ui`
+Make sure docker daemon is logged in to Huawei SWR first.
 
-3. Proceed to build/running the containers.
+```bash
+# build image
+docker build -t swr.cn-north-4.myhuaweicloud.com/mimic-predictors/backend:<version> .
 
-# How to Build/Run (using docker-compose)
+# push image to huawei SWR
+docker push swr.cn-north-4.myhuaweicloud.com/mimic-predictors/backend:<version>
+```
 
-1. Add expose directives to the `tf-serving` and `mongodb` services (in `docker-compose.yml`).
+# Apply rolling update to Docker Swarm stack
 
-   ```yml
-   # mongodb
-   expose:
-     - 27017
-   ---
-   # tf-serving
-   expose:
-     - 5000
-   ```
+Make sure docker daemon is logged in to Huawei SWR first.
 
-1. Attach Traefik labels' to containers (as opposed to attaching them to services) (in `docker-compose.prod.yml`).
-
-   ```yml
-   services:
-     frontend:
-       labels:
-         - "traefik.enable=true"
-   ```
-
-1. Remove Traefik swarm mode (in `docker-compose.traefik.yml`).
-
-   ```yml
-   # delete this line in the command group
-   command:
-     - "--providers.docker.swarmmode=true"
-   ```
-
-1. Remove port information labels for the frontend and backend (in `docker-compose.prod.yml`).
-
-   ```yml
-   services:
-     frontend:
-       deploy:
-         labels:
-           - "traefik.http.services.frontend.loadbalancer.server.port=80"
-
-     backend:
-       deploy:
-         labels:
-           - "traefik.http.services.backend.loadbalancer.server.port=80"
-   ```
-
-1. Remove manager node constraint (in `docker-compose.traefik.yml`).
-
-   ```yml
-   deploy:
-     placement:
-       constraints:
-         - node.role == manager
-   ```
-
-1. Execute the following command to build/run the containers.
-
-   ```bash
-   docker-compose -f docker-compose.yml -f docker-compose.traefik.yml -f docker-compose.prod.yml up -d
-   ```
-
-1. Go to [http://localhost/app/](http://localhost/app/)
-
-# How to Deploy (using docker swarm; default mode)
-
-1. Execute the following command to build/run the containers.
-
-   ```bash
-   docker stack deploy -c docker-compose.yml -c docker-compose.traefik.yml -c docker-compose.prod.yml mimic-predictors
-   ```
-
-1. Go to [http://localhost/app/](http://localhost/app/)
+```
+docker service update --image swr.cn-north-4.myhuaweicloud.com/mimic-predictors/backend:<version> <docker-stack-backend-service-name> --with-registry-auth
+```
