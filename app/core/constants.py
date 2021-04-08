@@ -1,7 +1,9 @@
+# 病历属性表
 from functools import reduce
 
 MODEL_ARCHITECTURES = ['gpt2', 'lstm']
 TARGETS = ['aki', 'sepsis', 'mi', 'vancomycin']
+# 病历属性的个数和记录时长的最大天数
 N_FEATURES = {
     'sepsis': 225,
     'mi': 221,

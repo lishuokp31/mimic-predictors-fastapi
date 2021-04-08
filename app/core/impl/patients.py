@@ -40,6 +40,7 @@ async def get_patients(db: motor.motor_asyncio.AsyncIOMotorDatabase):
 
 async def get_patient(
     patient_id: str,
+    # 数据库
     db: motor.motor_asyncio.AsyncIOMotorDatabase,
     grpc_client: TensorServingClient,
     norm_params: Dict[str, Dict[str, np.ndarray]],

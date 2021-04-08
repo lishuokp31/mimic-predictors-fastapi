@@ -1,4 +1,4 @@
-from ..models import Patient
+from ..models import Patient , Ner
 
 import motor.motor_asyncio
 
@@ -32,3 +32,25 @@ async def insert_patient(db: motor.motor_asyncio.AsyncIOMotorDatabase, patient: 
     # attempt to insert patient to database
     _ = await db.patients.insert_one(patient)
     return patient
+
+async def insert_ner(db: motor.motor_asyncio.AsyncIOMotorDatabase, entities: list, sequence: str,):
+    # ret = db.counters.findAndModify({"_id": 'productid'}, {"$inc": {"sequence_value": 1}}, safe=True, new=True)
+
+    # nextid = ret["sequence_value"]
+    
+    entities_directory = []
+    # entities_model = ["kind", "start_index", "end_index", "actual_value"]
+    for entity in entities:
+        # entities_directory.append(dict(zip(entities_model, entity)))
+        entities_directory.append(entity)
+
+    ner_db_directory = {
+        # "_id": "id", TODO:
+        "sequence": sequence,
+        "entities": entities_directory
+    }
+    
+    # ner_db_directory = ner._asdict()
+    _ = await db.ner.insert_one(ner_db_directory)
+
+    return ner_db_directory

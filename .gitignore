@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__
 /services/mongodb
+/services/finetuned-bert-medical-ner
+/app/core/ner/finetuned-bert-medical-ner
+/app/core/ner/__MACOSX

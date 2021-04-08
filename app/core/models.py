@@ -14,3 +14,6 @@ Patient = namedtuple('Patient', [
     'id', 'name', 'age', 'gender', 'weight',
     'height', 'ethnicity', 'addedAt', 'updatedAt', 'chartevents']
 )
+
+Ner = namedtuple('Ner',['entities']
+)

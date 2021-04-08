@@ -8,6 +8,7 @@ from core.impl import (
     get_patients as get_patients_impl,
     get_patient as get_patient_impl,
     import_patient as import_patient_impl,
+    import_ner as import_ner_impl
 )
 from core.models import PredictRequest
 from core.utils import (
@@ -33,6 +34,8 @@ if cors_origins is not None:
         allow_headers=['*'],
     )
 
+# 启动后端
+
 
 @app.on_event('startup')
 def startup_event():
@@ -40,11 +43,16 @@ def startup_event():
     vars['norm_params'] = init_norm_params()
     vars['db_client'], vars['db'] = init_mongodb()
 
+# 关闭后端
+
 
 @app.on_event('shutdown')
 def shutdown_event():
     if vars['db_client'] is not None:
         vars['db_client'].close()
+
+# 以下前后端数据交互的方法定义，方法实现在implements里边
+# 获取前端发送的数据并预测
 
 
 @app.post('/api/predict')
@@ -55,6 +63,8 @@ async def predict(payload: PredictRequest):
         norm_params=vars['norm_params'],
     )
 
+# 向前端发送示例数据
+
 
 @app.get('/api/load-sample')
 async def load_sample(target: str):
@@ -63,10 +73,14 @@ async def load_sample(target: str):
         db=vars['db'],
     )
 
+# 向前端发送病例数据
+
 
 @app.get('/api/patients')
 async def get_patients():
     return await get_patients_impl(db=vars['db'])
+
+# 获取前端的病例数据
 
 
 @app.post('/api/patients')
@@ -78,6 +92,7 @@ async def import_patient(
     ethnicity: str = Form(...),
     importfile: UploadFile = File(...)
 ):
+    print(name)
     return await import_patient_impl(
         db=vars['db'],
         id=id,
@@ -90,6 +105,8 @@ async def import_patient(
         import_file=importfile,
     )
 
+# 向前端发送某一特定id的病例数据
+
 
 @app.get('/api/patients/{patient_id}')
 async def get_patient(patient_id: str):
@@ -99,3 +116,23 @@ async def get_patient(patient_id: str):
         grpc_client=vars['grpc_client'],
         norm_params=vars['norm_params'],
     )
+
+# 获取前端的实体识别文本
+
+
+@app.post('/api/ner')
+async def import_ner(
+    sequence: str = Form(...),
+    # file_import: bool = Form(...),
+    # importfile: UploadFile = File(...)
+):
+    print(sequence)
+    return await import_ner_impl(
+        db=vars['db'],
+        sequence=sequence,
+        # file_import=file_import,
+        # importfile=importfile,
+    )
+
+
+#  TODO:

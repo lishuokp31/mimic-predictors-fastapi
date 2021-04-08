@@ -5,3 +5,4 @@ from .patients import (
     get_patient,
     import_patient,
 )
+from .ner import import_ner
