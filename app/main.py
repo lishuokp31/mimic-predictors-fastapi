@@ -5,10 +5,13 @@ from core.db.utils import init_mongodb
 from core.impl import (
     predict as predict_impl,
     load_sample as load_sample_impl,
+    load_specified_sample as load_specified_sample_impl,
     get_patients as get_patients_impl,
     get_patient as get_patient_impl,
     import_patient as import_patient_impl,
-    import_ner as import_ner_impl
+    import_ner as import_ner_impl,
+    login as login_impl,
+    register as register_impl
 )
 from core.models import PredictRequest
 from core.utils import (
@@ -73,6 +76,20 @@ async def load_sample(target: str):
         db=vars['db'],
     )
 
+
+@app.post('/api/load-specified-sample')
+async def load_specified_sample(
+    target: str = Form(...),
+    objectid: str = Form(...),
+):
+    print("target:"+target)
+    print("objectid:"+objectid)
+    return await load_specified_sample_impl(
+        target=target,
+        objectid=objectid,
+        db=vars['db'],
+    )
+
 # 向前端发送病例数据
 
 
@@ -120,7 +137,7 @@ async def get_patient(patient_id: str):
 # 获取前端的实体识别文本
 
 
-@app.post('/api/ner')
+@app.post('/api/ner/txt')
 async def import_ner(
     sequence: str = Form(...),
     # file_import: bool = Form(...),
@@ -135,4 +152,54 @@ async def import_ner(
     )
 
 
+@app.post('/api/ner/file')
+async def import_ner2(
+    file_sequence: str = Form(...)
+    # file_import: bool = Form(...),
+    # importfile: UploadFile = File(...)
+):
+    print("flagflagflagflagflagflagflagflagflagflagflagflagflag")
+    for sequence in file_sequence:
+        print(sequence)
+
+    # return await import_ner_impl(
+    #     db=vars['db'],
+    #     sequence=sequence,
+        # file_import=file_import,
+        # importfile=importfile,
+    # )
 #  TODO:
+
+
+@app.post('/api/ner/login')
+async def login(
+    userName: str = Form(...),
+    password: str = Form(...),
+    remember: bool = Form(...)
+):
+    print("userName:" + userName)
+    print("password:" + password)
+    return await login_impl(
+        db=vars['db'],
+        userName=userName,
+        password=password,
+        remember=remember)
+
+
+@app.post('/api/ner/register')
+async def register(
+    username: str = Form(...),
+    password: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(...),
+):
+    print("username:" + username)
+    print("password:" + password)
+    print("email:" + email)
+    print("phone:" + phone)
+    return await register_impl(
+        db=vars['db'],
+        username=username,
+        password=password,
+        email=email,
+        phone=phone)

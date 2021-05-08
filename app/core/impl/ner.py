@@ -1,20 +1,10 @@
-from datetime import datetime
-from fastapi import HTTPException, status, UploadFile
-from min_tfs_client.requests import TensorServingClient
-from typing import Dict
 import motor.motor_asyncio
 
-from ..constants import GENDERS, ETHNICITIES
 from ..db.crud import (
     insert_ner,
 )
 from ..models import Ner
-from .utils import (
-    parse_chartevents,
-    reduce_chartevents,
-    extract_metrics,
-    extract_disease_probabilities,
-)
+
 from ..ner.classify import do_classify
 
 import numpy as np

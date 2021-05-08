@@ -1,11 +1,17 @@
 from ..models import Patient , Ner
-
+from bson import ObjectId
 import motor.motor_asyncio
 
 
 async def get_random_sample(target: str, db: motor.motor_asyncio.AsyncIOMotorDatabase):
     async for row in db[target].aggregate([{'$sample': {'size': 1}}]):
+        print(row)
         return row
+
+async def get_specified_sample(target: str, objectid : str , db: motor.motor_asyncio.AsyncIOMotorDatabase):
+    result = await db[target].find_one({"_id" : ObjectId(objectid)})
+    print(result)
+    return result
 
 
 async def get_all_patients(db: motor.motor_asyncio.AsyncIOMotorDatabase, docs_per_page: int = 100):
