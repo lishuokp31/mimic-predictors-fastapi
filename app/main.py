@@ -11,7 +11,12 @@ from core.impl import (
     import_patient as import_patient_impl,
     import_ner as import_ner_impl,
     login as login_impl,
-    register as register_impl
+    register as register_impl,
+    get_favorites as get_favorites_impl,
+    # get_favorite as get_favorite_impl
+    add_favorite as add_favorite_impl,
+    delete_favorites as delete_favorites_impl,
+    similarity_calculate as similarity_calculate_impl
 )
 from core.models import PredictRequest
 from core.utils import (
@@ -171,11 +176,11 @@ async def import_ner2(
 #  TODO:
 
 
-@app.post('/api/ner/login')
+@app.post('/api/login')
 async def login(
     userName: str = Form(...),
     password: str = Form(...),
-    remember: bool = Form(...)
+    # remember: bool = Form(...)
 ):
     print("userName:" + userName)
     print("password:" + password)
@@ -183,10 +188,11 @@ async def login(
         db=vars['db'],
         userName=userName,
         password=password,
-        remember=remember)
+        # remember=remember
+    )
 
 
-@app.post('/api/ner/register')
+@app.post('/api/register')
 async def register(
     username: str = Form(...),
     password: str = Form(...),
@@ -203,3 +209,62 @@ async def register(
         password=password,
         email=email,
         phone=phone)
+
+
+@app.get('/api/favorites/{username}')
+async def get_favorites(username: str):
+    return await get_favorites_impl(db=vars['db'] , username = username)
+
+# @app.get('/api/favorites/{favorite_id}')
+# async def get_favorite(favorite_id: str):
+#     return await get_favorite_impl(
+#         favorite_id=favorite_id,
+#         db=vars['db'],
+#         grpc_client=vars['grpc_client'],
+#         norm_params=vars['norm_params'],
+#     )
+
+@app.post('/api/favorites/add')
+async def add_favorite(
+    username: str = Form(...),
+    id: str = Form(...),
+    fav_type: str = Form(...),
+    remark: str = Form(...),
+    value: str = Form(...),
+):
+    # print("username:" + username)
+    # print("id:" + id)
+    # print("fav_type:" + fav_type)
+    # print("remark:" + remark)
+    # print("value:" + value)
+    return await add_favorite_impl(
+        db=vars['db'],
+        username=username, 
+        id=id, 
+        fav_type=fav_type, 
+        remark=remark, 
+        value=value
+    )
+
+@app.post('/api/favorites/delete')
+async def delete_favorites(
+    username: str = Form(...),
+    id: str = Form(...),
+):
+    print('username' + username)
+    print('id' + id)
+    return await delete_favorites_impl(
+        db=vars['db'],
+        username = username, 
+        id = id)
+
+@app.post('/api/similarity_calculate')
+async def similarity_calculate():
+    await similarity_calculate_impl(
+        db=vars['db'],
+    )
+
+
+
+# if (__name__ == "__main__"):
+#     similarity_calculate() 
