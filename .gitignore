@@ -4,3 +4,4 @@ __pycache__
 /services/finetuned-bert-medical-ner
 /app/core/ner/finetuned-bert-medical-ner
 /app/core/ner/__MACOSX
+/data

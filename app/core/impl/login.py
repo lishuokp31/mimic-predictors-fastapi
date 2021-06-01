@@ -14,6 +14,7 @@ async def login(
         if(result.get('password') != password):
             return {
                 "login": False,
+                "level": -10
             }
         return {
             "login": True,
@@ -25,4 +26,5 @@ async def login(
     else:
         return {
             "login": False,
+            "level": -9
         }

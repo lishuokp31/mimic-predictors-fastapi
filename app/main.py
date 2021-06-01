@@ -1,5 +1,8 @@
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import tensorflow as tf
+
 
 from core.db.utils import init_mongodb
 from core.impl import (
@@ -13,10 +16,12 @@ from core.impl import (
     login as login_impl,
     register as register_impl,
     get_favorites as get_favorites_impl,
-    # get_favorite as get_favorite_impl
     add_favorite as add_favorite_impl,
+    modify_favorite as modify_favorite_impl,
     delete_favorites as delete_favorites_impl,
-    similarity_calculate as similarity_calculate_impl
+    get_users as get_users_impl,
+    update_user as update_user_impl,
+    similarity as similarity_impl
 )
 from core.models import PredictRequest
 from core.utils import (
@@ -213,16 +218,8 @@ async def register(
 
 @app.get('/api/favorites/{username}')
 async def get_favorites(username: str):
-    return await get_favorites_impl(db=vars['db'] , username = username)
+    return await get_favorites_impl(db=vars['db'], username=username)
 
-# @app.get('/api/favorites/{favorite_id}')
-# async def get_favorite(favorite_id: str):
-#     return await get_favorite_impl(
-#         favorite_id=favorite_id,
-#         db=vars['db'],
-#         grpc_client=vars['grpc_client'],
-#         norm_params=vars['norm_params'],
-#     )
 
 @app.post('/api/favorites/add')
 async def add_favorite(
@@ -239,12 +236,36 @@ async def add_favorite(
     # print("value:" + value)
     return await add_favorite_impl(
         db=vars['db'],
-        username=username, 
-        id=id, 
-        fav_type=fav_type, 
-        remark=remark, 
+        username=username,
+        id=id,
+        fav_type=fav_type,
+        remark=remark,
         value=value
     )
+
+
+@app.post('/api/favorites/modify')
+async def modify_favorite(
+    username: str = Form(...),
+    id: str = Form(...),
+    fav_type: str = Form(...),
+    remark: str = Form(...),
+    value: str = Form(...),
+):
+    # print("username:" + username)
+    # print("id:" + id)
+    # print("fav_type:" + fav_type)
+    # print("remark:" + remark)
+    # print("value:" + value)
+    return await modify_favorite_impl(
+        db=vars['db'],
+        username=username,
+        id=id,
+        fav_type=fav_type,
+        remark=remark,
+        value=value
+    )
+
 
 @app.post('/api/favorites/delete')
 async def delete_favorites(
@@ -255,16 +276,30 @@ async def delete_favorites(
     print('id' + id)
     return await delete_favorites_impl(
         db=vars['db'],
-        username = username, 
-        id = id)
+        username=username,
+        id=id)
 
-@app.post('/api/similarity_calculate')
-async def similarity_calculate():
-    await similarity_calculate_impl(
+
+@app.get('/api/users')
+async def get_users():
+    return await get_users_impl(db=vars['db'])
+
+
+@app.post('/api/users/update')
+async def update_user(
+    username: str = Form(...),
+    modified_level: str = Form(...),
+):
+    return await update_user_impl(
+        db=vars['db'], 
+        username=username, 
+        modified_level=modified_level)
+
+
+@app.get('/api/similarity/{current_id}')
+async def similarity(current_id: str):
+    print('similarity_begin')
+    return await similarity_impl(
         db=vars['db'],
+        current_id=current_id,
     )
-
-
-
-# if (__name__ == "__main__"):
-#     similarity_calculate() 

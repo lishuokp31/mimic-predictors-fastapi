@@ -1,8 +1,8 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-slim
 
 # pip mirror to use (choose fast mirr)
-# ARG PIP_MIRROR=https://pypi.python.org/simple/
-ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple  
+ARG PIP_MIRROR=https://pypi.python.org/simple/
+# ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple  
 
 COPY requirements.txt /
 RUN python -m pip install --upgrade pip

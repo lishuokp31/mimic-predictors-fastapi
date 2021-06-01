@@ -9,9 +9,14 @@ from .patients import (
 from .favorites import (
     get_favorites,
     add_favorite,
+    modify_favorite,
     delete_favorites,
 )
 from .ner import import_ner
 from .login import login
+from .user import (
+    get_users,
+    update_user
+    )
 from .register import register
-from .similarity_calculate import similarity_calculate
+from .similarity import similarity

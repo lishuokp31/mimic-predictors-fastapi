@@ -1,4 +1,5 @@
-from min_tfs_client.requests import TensorServingClient
+from tensorflow_serving.apis.prediction_service_pb2_grpc import PredictionServiceStub
+# from min_tfs_client.requests import TensorServingClient
 from typing import Any, Dict, List
 
 from .predict import predict
@@ -76,50 +77,50 @@ def extract_metrics(chartevents: pd.DataFrame):
         {
             'label': '体温',
             'unit': '℃',
-            # 'mean': chartevents['temperature'].iloc[-1].item(),
-            # 'min': chartevents['temperature_min'].iloc[-1].item(),
-            # 'max': chartevents['temperature_max'].iloc[-1].item(),
-            # 'std': chartevents['temperature_std'].iloc[-1].item(),
-            'mean': 0,
-            'min': 0,
-            'max': 0,
-            'std': 0,
+            'mean': chartevents['temperature'].iloc[-1].item(),
+            'min': chartevents['temperature_min'].iloc[-1].item(),
+            'max': chartevents['temperature_max'].iloc[-1].item(),
+            'std': chartevents['temperature_std'].iloc[-1].item(),
+            # 'mean': 0,
+            # 'min': 0,
+            # 'max': 0,
+            # 'std': 0,
         },
         {
             'label': '心率',
             'unit': 'bpm',
-            # 'mean': chartevents['heart rate'].iloc[-1].item(),
-            # 'min': chartevents['heart rate_min'].iloc[-1].item(),
-            # 'max': chartevents['heart rate_max'].iloc[-1].item(),
-            # 'std': chartevents['heart rate_std'].iloc[-1].item(),
-            'mean': 0,
-            'min': 0,
-            'max': 0,
-            'std': 0,
+            'mean': chartevents['heart rate'].iloc[-1].item(),
+            'min': chartevents['heart rate_min'].iloc[-1].item(),
+            'max': chartevents['heart rate_max'].iloc[-1].item(),
+            'std': chartevents['heart rate_std'].iloc[-1].item(),
+            # 'mean': 0,
+            # 'min': 0,
+            # 'max': 0,
+            # 'std': 0,
         },
         {
             'label': '收缩压',
             'unit': 'mmHg',
-            # 'mean': chartevents['systolic'].iloc[-1].item(),
-            # 'min':  chartevents['systolic_min'].iloc[-1].item(),
-            # 'max':  chartevents['systolic_max'].iloc[-1].item(),
-            # 'std':  chartevents['systolic_std'].iloc[-1].item(),
-            'mean': 0,
-            'min': 0,
-            'max': 0,
-            'std': 0,
+            'mean': chartevents['systolic'].iloc[-1].item(),
+            'min':  chartevents['systolic_min'].iloc[-1].item(),
+            'max':  chartevents['systolic_max'].iloc[-1].item(),
+            'std':  chartevents['systolic_std'].iloc[-1].item(),
+            # 'mean': 0,
+            # 'min': 0,
+            # 'max': 0,
+            # 'std': 0,
         },
         {
             'label': '舒张压',
             'unit': 'mmHg',
-            # 'mean': chartevents['diastolic'].iloc[-1].item(),
-            # 'min': chartevents['diastolic_min'].iloc[-1].item(),
-            # 'max': chartevents['diastolic_max'].iloc[-1].item(),
-            # 'std': chartevents['diastolic_std'].iloc[-1].item(),
-            'mean': 0,
-            'min': 0,
-            'max': 0,
-            'std': 0,
+            'mean': chartevents['diastolic'].iloc[-1].item(),
+            'min': chartevents['diastolic_min'].iloc[-1].item(),
+            'max': chartevents['diastolic_max'].iloc[-1].item(),
+            'std': chartevents['diastolic_std'].iloc[-1].item(),
+            # 'mean': 0,
+            # 'min': 0,
+            # 'max': 0,
+            # 'std': 0,
         }
     ]
 
@@ -127,7 +128,8 @@ def extract_metrics(chartevents: pd.DataFrame):
 def extract_disease_probabilities(
     patient: Dict[str, Any],
     df: pd.DataFrame,
-    grpc_client: TensorServingClient,
+    stub: PredictionServiceStub,
+    # grpc_client: TensorServingClient,
     params: Dict[str, Dict[str, np.ndarray]],
 ):
     # extract static information from patient
@@ -144,10 +146,10 @@ def extract_disease_probabilities(
     df = df.iloc[-N_TIMESTEPS['sepsis']:]
 
     return {
-        # 'aki': do_predict(df.copy(), grpc_client, params, 'aki', AKI_FEATURES),
-        # 'sepsis': do_predict(df.copy(), grpc_client, params, 'sepsis', SEPSIS_FEATURES),
-        # 'mi': do_predict(df.copy(), grpc_client, params, 'mi', MI_FEATURES),
-        # 'vancomycin': do_predict(df.copy(), grpc_client, params, 'vancomycin', VANCOMYCIN_FEATURES),
+        'aki': do_predict(df.copy(), stub, params, 'aki', AKI_FEATURES),
+        'sepsis': do_predict(df.copy(), stub, params, 'sepsis', SEPSIS_FEATURES),
+        'mi': do_predict(df.copy(), stub, params, 'mi', MI_FEATURES),
+        'vancomycin': do_predict(df.copy(), stub, params, 'vancomycin', VANCOMYCIN_FEATURES),
         'aki': np.random.randn(14).tolist(),
         'sepsis': np.random.randn(14).tolist(),
         'mi': np.random.randn(14).tolist(),
@@ -157,7 +159,8 @@ def extract_disease_probabilities(
 
 def do_predict(
     df: pd.DataFrame,
-    grpc_client: TensorServingClient,
+    stub: PredictionServiceStub,
+    # grpc_client: TensorServingClient,
     params: Dict[str, Dict[str, np.ndarray]],
     target: str,
     features: List[str],
@@ -177,7 +180,8 @@ def do_predict(
     try:
         x = df[features].values.tolist()
         payload = PredictRequest(target=target, x=x)
-        response = predict(payload, grpc_client, params)
+        response = predict(payload, stub, params)
+        # response = predict(payload, grpc_client, params)
         predictions, weights = response['predictions'], response['weights']
     except KeyError:
         # we fill missing values with nan so that the user will know which

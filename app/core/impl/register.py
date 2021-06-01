@@ -27,6 +27,12 @@ async def register(
         print(result2)
         if(result2 is not None):
             print("注册成功！")
+            favorite_list = []
+            favorite_db_directory = {
+                "username": username,
+                "favorite_list": favorite_list,
+            }
+            add_result = await db.favorites.insert_one(favorite_db_directory)
             return 1
         print("注册失败，请联系管理员解决")
         return -1

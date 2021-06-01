@@ -6,17 +6,15 @@ async def get_favorites(
     db: motor.motor_asyncio.AsyncIOMotorDatabase, username: str
 ):
     favorites = await db.favorites.find_one({'username': username})
-    print("--------------------favorites--------------------")
-    print(favorites)
-    ("--------------------favorites end--------------------")
     result = []
-    for favorite_entity in favorites.get('favorite_list'):
-        result.append({
-            'id': favorite_entity[0],
-            'fav_type': favorite_entity[1],
-            'remark': favorite_entity[2],
-            'value': favorite_entity[3],
-        })
+    if(favorites is not None):
+        for favorite_entity in favorites.get('favorite_list'):
+            result.append({
+                'id': favorite_entity[0],
+                'fav_type': favorite_entity[1],
+                'remark': favorite_entity[2],
+                'value': favorite_entity[3],
+            })
 
     return result
 
@@ -54,6 +52,25 @@ async def add_favorite(
         print(add_result)
         ("--------------------add_result end--------------------")
 
+async def modify_favorite(
+    db: motor.motor_asyncio.AsyncIOMotorDatabase,
+    username: str,
+    id: str,
+    fav_type: str,
+    remark: str,
+    value: str
+):
+    user_fav = await db.favorites.find_one({"username": username})
+    favorite_list = user_fav.get('favorite_list')
+    for i in range(len(favorite_list)):
+        if favorite_list[i][3] == value:
+            favorite_list[i][0] = id
+            favorite_list[i][2] = remark
+            break
+    # print("favorite_list:")
+    # print(favorite_list)
+    modify_result = await db.favorites.update_one({"username": username}, {"$set": {"favorite_list": favorite_list}})
+    # print(modify_result)
 
 async def delete_favorites(
     db: motor.motor_asyncio.AsyncIOMotorDatabase, username: str,
