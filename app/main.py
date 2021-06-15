@@ -35,9 +35,9 @@ vars = {}
 app = FastAPI()
 
 # configure CORS middleware if origins env var is set
-cors_origins = '*'
+# cors_origins = '*'
 
-
+cors_origins = os.getenv('CORS_ORIGINS')
 if cors_origins is not None:
     app.add_middleware(
         CORSMiddleware,

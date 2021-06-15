@@ -5,3 +5,5 @@ __pycache__
 /app/core/ner/finetuned-bert-medical-ner
 /app/core/ner/__MACOSX
 /data
+data.rar
+orders.txt

@@ -235,8 +235,19 @@ def file_round():
         json.dump(result, f)
     print("the end")
 
+def generate_array():
+    array = []
+    i = 0
+    base = 0
+    for i in range(0,31):
+        array.append(base)
+        base += 50
+    with open("test.txt","w") as f:
+        f.write(str(array))
+
 if (__name__ == "__main__"):
     # similarity_calculate2()
     # file_handle()
-    file_round()
+    # file_round()
+    generate_array()
     
